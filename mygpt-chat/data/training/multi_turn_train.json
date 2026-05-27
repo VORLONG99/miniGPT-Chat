@@ -1,0 +1,86 @@
+[
+  {
+    "conversations": [
+      {
+        "role": "user",
+        "content": "我想学习 Python"
+      },
+      {
+        "role": "assistant",
+        "content": "很好的选择！建议学习路径：\n\n**第1周：基础语法** - 变量、类型、控制流\n**第2-3周：进阶** - OOP、异常、标准库\n**第4周：项目实战** - 选小项目动手做\n\n你想从哪个部分开始？"
+      },
+      {
+        "role": "user",
+        "content": "从基础语法开始吧"
+      },
+      {
+        "role": "assistant",
+        "content": "好的！从最基础的部分开始：\n\n```python\n# 1. 变量\nname = \"Alice\"      # 字符串\nage = 25            # 整数\nheight = 1.68       # 浮点数\n\n# 2. 运算\nprint(10 + 3)       # 13\nprint(10 // 3)      # 3 整除\nprint(10 ** 3)      # 1000 幂\n\n# 3. 字符串\nprint(f\"我叫{name}，今年{age}岁\")\n```\n\n试着运行这些代码，有疑问随时问我！"
+      },
+      {
+        "role": "user",
+        "content": "条件语句怎么写"
+      },
+      {
+        "role": "assistant",
+        "content": "Python 条件语句非常简洁：\n\n```python\nscore = 85\n\nif score >= 90:\n    print(\"优秀\")\nelif score >= 80:\n    print(\"良好\")  # 这行会执行\nelif score >= 60:\n    print(\"及格\")\nelse:\n    print(\"不及格\")\n\n# 三元表达式\nstatus = \"成年\" if age >= 18 else \"未成年\"\n```\n\n小练习：写一个判断闰年的程序？"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "role": "user",
+        "content": "帮我设计一个数据库表结构"
+      },
+      {
+        "role": "assistant",
+        "content": "需要了解：\n1. 业务场景？\n2. 核心实体？\n3. 数据量级？\n\n请简单描述你的项目。"
+      },
+      {
+        "role": "user",
+        "content": "一个博客系统，有用户、文章、评论"
+      },
+      {
+        "role": "assistant",
+        "content": "核心表设计：\n\n```sql\nCREATE TABLE users (\n    id SERIAL PRIMARY KEY,\n    username VARCHAR(50) UNIQUE NOT NULL,\n    email VARCHAR(100) UNIQUE NOT NULL,\n    created_at TIMESTAMP DEFAULT NOW()\n);\n\nCREATE TABLE posts (\n    id SERIAL PRIMARY KEY,\n    user_id INTEGER REFERENCES users(id),\n    title VARCHAR(200) NOT NULL,\n    content TEXT NOT NULL,\n    status VARCHAR(20) DEFAULT 'draft',\n    created_at TIMESTAMP DEFAULT NOW()\n);\n\nCREATE TABLE comments (\n    id SERIAL PRIMARY KEY,\n    post_id INTEGER REFERENCES posts(id),\n    user_id INTEGER REFERENCES users(id),\n    content TEXT NOT NULL,\n    created_at TIMESTAMP DEFAULT NOW()\n);\n```\n\n需要补充标签、分类吗？"
+      },
+      {
+        "role": "user",
+        "content": "加上标签和分类"
+      },
+      {
+        "role": "assistant",
+        "content": "补充：\n\n```sql\n-- 分类（一对多）\nCREATE TABLE categories (\n    id SERIAL PRIMARY KEY,\n    name VARCHAR(50) NOT NULL\n);\nALTER TABLE posts ADD COLUMN category_id INTEGER REFERENCES categories(id);\n\n-- 标签（多对多）\nCREATE TABLE tags (\n    id SERIAL PRIMARY KEY,\n    name VARCHAR(30) NOT NULL\n);\nCREATE TABLE post_tags (\n    post_id INTEGER REFERENCES posts(id),\n    tag_id INTEGER REFERENCES tags(id),\n    PRIMARY KEY (post_id, tag_id)\n);\n```"
+      }
+    ]
+  },
+  {
+    "conversations": [
+      {
+        "role": "user",
+        "content": "如何部署一个 Web 应用"
+      },
+      {
+        "role": "assistant",
+        "content": "部署方案取决于规模：\n\n**小型（个人项目）**\n- Vercel / Railway / Render\n- 一键部署，免费额度\n\n**中型（创业项目）**\n- Docker + 云服务器（阿里云/腾讯云）\n- Nginx 反向代理\n\n**大型（企业级）**\n- Kubernetes + 容器编排\n- CDN + 负载均衡\n\n你当前是什么规模？"
+      },
+      {
+        "role": "user",
+        "content": "中型项目，用 Docker 部署 Python 应用"
+      },
+      {
+        "role": "assistant",
+        "content": "Docker 部署 Python 应用完整步骤：\n\n**1. Dockerfile**\n```dockerfile\nFROM python:3.11-slim\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\nCOPY . .\nEXPOSE 8000\nCMD [\"uvicorn\", \"app.main:app\", \"--host\", \"0.0.0.0\", \"--port\", \"8000\"]\n```\n\n**2. docker-compose.yml**\n```yaml\nversion: '3.8'\nservices:\n  web:\n    build: .\n    ports:\n      - \"8000:8000\"\n    depends_on:\n      - db\n      - redis\n  db:\n    image: postgres:15\n    environment:\n      POSTGRES_DB: myapp\n      POSTGRES_PASSWORD: secret\n  redis:\n    image: redis:7-alpine\n```\n\n**3. 部署命令**\n```bash\ndocker-compose up -d\ndocker-compose logs -f  # 查看日志\n```"
+      },
+      {
+        "role": "user",
+        "content": "如何配置 Nginx 反向代理"
+      },
+      {
+        "role": "assistant",
+        "content": "Nginx 反向代理配置：\n\n```nginx\nserver {\n    listen 80;\n    server_name yourdomain.com;\n\n    location / {\n        proxy_pass http://127.0.0.1:8000;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n    }\n\n    # WebSocket 支持\n    location /ws {\n        proxy_pass http://127.0.0.1:8000;\n        proxy_http_version 1.1;\n        proxy_set_header Upgrade $http_upgrade;\n        proxy_set_header Connection \"upgrade\";\n    }\n}\n```\n\n配置完成后：\n```bash\nsudo nginx -t        # 测试配置\nsudo nginx -s reload  # 重新加载\n```"
+      }
+    ]
+  }
+]
